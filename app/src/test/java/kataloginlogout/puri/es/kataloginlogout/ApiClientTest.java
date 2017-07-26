@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 public class ApiClientTest {
     @Test
     public void login() throws Exception {
-     ApiClient apiClient = new ApiClient(new MockClock());
+     ApiClient apiClient = new ApiClient(new Clock());
      boolean res= apiClient.login("pedro@karumi.com","123456");
      assertEquals(true, res);
 
@@ -18,18 +18,32 @@ public class ApiClientTest {
     }
 
     @Test
-    public void logout() throws Exception {
-        ApiClient apiClient = new ApiClient(new MockClock());
+    public void shpuldLogoutBeSuccesfulIfSecondIsEven() throws Exception {
+        ApiClient apiClient = new ApiClient(new MockClock(1000));
         boolean res= apiClient.logout();
         assertEquals(true, res);
+
+    }
+
+    @Test
+    public void shpuldLogoutFailIfSecondIsOdd() throws Exception {
+        ApiClient apiClient = new ApiClient(new MockClock(1001));
+        boolean res= apiClient.logout();
+        assertEquals(false, res);
 
     }
 
 }
 
 class MockClock extends Clock {
+
+    private int fixedTime;
+    MockClock(int timeToSend){
+        fixedTime = timeToSend;
+    }
+
     @Override
     public long getCurrentTime(){
-        return 1000;
+        return fixedTime;
     }
 }

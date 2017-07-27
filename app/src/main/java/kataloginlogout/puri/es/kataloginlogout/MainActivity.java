@@ -9,8 +9,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements LogInView {
 
+    private LogInPresenter presenter;
 
 
     @Override
@@ -19,11 +20,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         setContentView(R.layout.activity_main);
 
+        final ApiClient apiclient = new ApiClient(new Clock());
+        presenter = new LogInPresenter(apiclient, this);
 
         final EditText emailText = (EditText)findViewById(R.id.email);
         final EditText passwordText = (EditText)findViewById(R.id.password);
+        final Button buttonLogOut = (Button)findViewById(R.id.buttonLogOut);
         final Button buttonLogin = (Button)findViewById(R.id.buttonLogin);
-        buttonLogin.setOnClickListener(this);
+        final TextView errorMessage = (TextView)findViewById(R.id.errorMessage);
+
+        buttonLogin.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                presenter.login(emailText.getText().toString(), passwordText.getText().toString());
+
+                /*boolean result = apiclient.login(emailText.getText().toString(), passwordText.getText().toString());
+
+                if (result) {
+                    buttonLogOut.setVisibility(View.VISIBLE);
+                    emailText.setVisibility(View.INVISIBLE);
+                    passwordText.setVisibility(View.INVISIBLE);
+                    buttonLogin.setVisibility(View.INVISIBLE);
+                } else {
+                    errorMessage.setVisibility(View.VISIBLE);
+                }*/
+            }
+        });
 
         emailText.addTextChangedListener(new TextWatcher() {
              @Override
@@ -69,22 +91,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     @Override
-    public void onClick(View v) {
-        ApiClient apiclient = new ApiClient(new Clock());
+    public void showErrorMessage() {
+        final TextView errorMessage = (TextView)findViewById(R.id.errorMessage);
+        errorMessage.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showLogOutActivity() {
         final EditText emailText = (EditText)findViewById(R.id.email);
         final EditText passwordText = (EditText)findViewById(R.id.password);
-        boolean result = apiclient.login(emailText.getText().toString(), passwordText.getText().toString());
+        final Button buttonLogOut = (Button)findViewById(R.id.buttonLogOut);
+        final Button buttonLogin = (Button)findViewById(R.id.buttonLogin);
+        buttonLogOut.setVisibility(View.VISIBLE);
+        emailText.setVisibility(View.INVISIBLE);
+        passwordText.setVisibility(View.INVISIBLE);
+        buttonLogin.setVisibility(View.INVISIBLE);
 
-        if (result) {
-            final Button buttonLogOut = (Button)findViewById(R.id.buttonLogOut);
-            final Button buttonLogin = (Button)findViewById(R.id.buttonLogin);
-            buttonLogOut.setVisibility(View.VISIBLE);
-            emailText.setVisibility(View.INVISIBLE);
-            passwordText.setVisibility(View.INVISIBLE);
-            buttonLogin.setVisibility(View.INVISIBLE);
-        } else {
-            final TextView errorMessage = (TextView)findViewById(R.id.errorMessage);
-            errorMessage.setVisibility(View.VISIBLE);
-        }
     }
 }
